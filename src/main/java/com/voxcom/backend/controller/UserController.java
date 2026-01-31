@@ -28,20 +28,35 @@ public class UserController {
         return userRepository.findById(email).orElse(null);
     }
 
-    // ✅ STATS ENDPOINT
+   // ✅ STATS ENDPOINT (DEBUG VERSION)
     @GetMapping("/stats")
     public UserStatsResponse getUserStats(@RequestParam String email) {
+        try {
+            System.out.println("📩 Incoming email param: " + email);
 
-        User user = userRepository.findById(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            User user = userRepository.findById(email)
+                    .orElseThrow(() -> new RuntimeException("User not found for email: " + email));
 
-        return new UserStatsResponse(
-                user.getName(),
-                user.getEmail(),
-                user.getTotalTasks(),
-                user.getCompletedCount(),
-                user.getIncompleteCount()
-        );
+            System.out.println("👤 User fetched: " + user);
+
+            System.out.println("📊 totalTasks=" + user.getTotalTasks());
+            System.out.println("📊 completed=" + user.getCompletedCount());
+            System.out.println("📊 incomplete=" + user.getIncompleteCount());
+
+            return new UserStatsResponse(
+                    user.getName(),
+                    user.getEmail(),
+                    user.getTotalTasks(),
+                    user.getCompletedCount(),
+                    user.getIncompleteCount()
+            );
+
+        } catch (Exception e) {
+            System.err.println("🔥 ERROR IN /user/stats");
+            e.printStackTrace();
+            throw e;
+        }
     }
+
 }
 

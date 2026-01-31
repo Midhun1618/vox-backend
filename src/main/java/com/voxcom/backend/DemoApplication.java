@@ -4,6 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = "com.voxcom.backend")
+@EnableScheduling
+
 public class DemoApplication {
 
     public static void main(String[] args) {

@@ -5,7 +5,9 @@ import com.voxcom.backend.dto.UserStatsResponse;
 import com.voxcom.backend.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/user")
@@ -31,32 +33,21 @@ public class UserController {
    // ✅ STATS ENDPOINT (DEBUG VERSION)
     @GetMapping("/stats")
     public UserStatsResponse getUserStats(@RequestParam String email) {
-        try {
-            System.out.println("📩 Incoming email param: " + email);
 
-            User user = userRepository.findById(email)
-                    .orElseThrow(() -> new RuntimeException("User not found for email: " + email));
+        User user = userRepository.findById(email)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "User not found for email: " + email
+                        )
+                );
 
-            System.out.println("👤 User fetched: " + user);
-
-            System.out.println("📊 totalTasks=" + user.getTotalTasks());
-            System.out.println("📊 completed=" + user.getCompletedCount());
-            System.out.println("📊 incomplete=" + user.getIncompleteCount());
-
-            return new UserStatsResponse(
-                    user.getName(),
-                    user.getEmail(),
-                    user.getTotalTasks(),
-                    user.getCompletedCount(),
-                    user.getIncompleteCount()
-            );
-
-        } catch (Exception e) {
-            System.err.println("🔥 ERROR IN /user/stats");
-            e.printStackTrace();
-            throw e;
-        }
+        return new UserStatsResponse(
+                user.getName(),
+                user.getEmail(),
+                user.getTotalTasks(),
+                user.getCompletedCount(),
+                user.getIncompleteCount()
+        );
     }
-
 }
-

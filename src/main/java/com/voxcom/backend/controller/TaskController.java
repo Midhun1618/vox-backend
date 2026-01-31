@@ -5,6 +5,7 @@ import com.voxcom.backend.model.User;
 import com.voxcom.backend.repository.TaskRepository;
 import com.voxcom.backend.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
+import com.voxcom.backend.dto.AddTaskRequest;
 
 import java.util.List;
 
@@ -20,20 +21,24 @@ public class TaskController {
         this.userRepo = userRepo;
     }
 
-    // ➕ ADD TASK
+
     @PostMapping
-    public Task addTask(@RequestParam String email, @RequestBody String text) {
+    public Task addTask(@RequestParam String email,@RequestBody AddTaskRequest request) {
+
         Task task = new Task();
         task.setUserEmail(email);
-        task.setText(text);
+        task.setText(request.getText());
         task.setDone(false);
 
-        User user = userRepo.findById(email).orElseThrow();
+        User user = userRepo.findById(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         user.setTotalTasks(user.getTotalTasks() + 1);
         userRepo.save(user);
 
         return taskRepo.save(task);
     }
+
 
     // ✅ MARK DONE
     @PutMapping("/{id}/done")
